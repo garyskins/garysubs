@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="utf-8" />
-<title>Sub + View Counter</title>
+<title>Sub Counter</title>
 
 <!-- 🔥 RUBIK FONT -->
 <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@900&display=swap" rel="stylesheet">
@@ -14,23 +14,20 @@ body {
   overflow: hidden;
 }
 
-/* 🔥 CENTER WRAPPER */
-#wrapper {
+#counter {
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  text-align: center;
-}
 
-/* 🧱 COMMON STYLE BASE */
-.counter {
   font-size: 90px;
   font-weight: 900;
   font-family: 'Rubik', Arial, sans-serif;
 
+  text-align: center;
   letter-spacing: 1px;
 
+  /* 🧊 CHROME GRADIENT /
   background: linear-gradient(to bottom,
     #ffffff 0%,
     #ffffff 35%,
@@ -44,47 +41,20 @@ body {
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 
-  -webkit-text-stroke: 5px black;
+  / 🖤 STRONG OUTLINE FOR HUD LOOK /
+  -webkit-text-stroke: 5px #2C333D;
 
+  / ✨ METAL DEPTH /
   text-shadow:
     0px 2px 0px rgba(0,0,0,0.25),
-    0px 6px 12px rgba(0,0,0,0.22);
+    0px 6px 12px rgba(0,0,0,0.22),
 }
-
-/* 👁 VIEW ROW */
-#viewsRow {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 15px;
-
-  margin-top: 10px;
-  font-size: 55px;
-}
-
-/* 👁 ICON */
-.eye {
-  font-size: 45px;
-  filter: drop-shadow(0px 2px 2px rgba(0,0,0,0.4));
-}
-
 </style>
 </head>
 
 <body>
 
-<div id="wrapper">
-
-  <!-- SUB COUNT -->
-  <div id="subs" class="counter">Loading...</div>
-
-  <!-- VIEW COUNT -->
-  <div id="viewsRow">
-    <div class="eye">👁</div>
-    <div id="views" class="counter" style="font-size:55px;">Loading...</div>
-  </div>
-
-</div>
+<div id="counter">Loading...</div>
 
 <script>
 
@@ -94,23 +64,19 @@ const API_KEY = "AIzaSyCVWFvY9cob_YfmoS3hP9S1iQ7FtCR429I";
 let currentSubs = 0;
 let targetSubs = 0;
 
-let currentViews = 0;
-let targetViews = 0;
-
-// 📡 fetch YouTube stats
-async function fetchStats() {
+// 📡 fetch subs
+async function fetchSubs() {
   try {
     const url =
-      `https://www.googleapis.com/youtube/v3/channels?part=statistics&id=${channelID}&key=${API_KEY}`;
+      https://www.googleapis.com/youtube/v3/channels?part=statistics&id=${channelID}&key=${API_KEY};
 
     const res = await fetch(url);
     const data = await res.json();
 
-    const stats = data?.items?.[0]?.statistics;
+    const subs = data?.items?.[0]?.statistics?.subscriberCount;
 
-    if (stats) {
-      targetSubs = parseInt(stats.subscriberCount || 0);
-      targetViews = parseInt(stats.viewCount || 0);
+    if (subs) {
+      targetSubs = parseInt(subs);
     }
 
   } catch (e) {
@@ -118,54 +84,44 @@ async function fetchStats() {
   }
 }
 
-// 🌊 smooth easing
+// 🌊 smooth ease-in-out (stream style)
 function easeInOutSine(t) {
-  return -(Math.cos(Math.PI * t) - 1) / 2;
+  return -(Math.cos(Math.PI t) - 1) / 2;
 }
 
+let displayValue = 0;
+let startValue = 0;
+let endValue = 0;
 let progress = 1;
-
-// 🎮 ANIMATE SUBS
-let subStart = 0;
-let subEnd = 0;
-
-// 🎮 ANIMATE VIEWS
-let viewStart = 0;
-let viewEnd = 0;
 
 function animate() {
 
-  // SUBS
-  if (subEnd !== targetSubs) {
-    subStart = currentSubs;
-    subEnd = targetSubs;
+  // detect change → restart smooth transition
+  if (endValue !== targetSubs) {
+    startValue = displayValue;
+    endValue = targetSubs;
     progress = 0;
   }
 
   if (progress < 1) {
-    progress += 0.0045;
+    progress += 0.005; // 🔥 smooth stream speed
 
     const eased = easeInOutSine(progress);
-    currentSubs = subStart + (subEnd - subStart) * eased;
-    currentViews = viewStart + (viewEnd - viewStart) * eased;
 
+    displayValue = startValue + (endValue - startValue) * eased;
   } else {
-    currentSubs = targetSubs;
-    currentViews = targetViews;
+    displayValue = targetSubs;
   }
 
-  document.getElementById("subs").innerText =
-    Math.floor(currentSubs).toLocaleString();
-
-  document.getElementById("views").innerText =
-    Math.floor(currentViews).toLocaleString();
+  document.getElementById("counter").innerText =
+    Math.floor(displayValue).toLocaleString();
 
   requestAnimationFrame(animate);
 }
 
 // start
-fetchStats();
-setInterval(fetchStats, 5000);
+fetchSubs();
+setInterval(fetchSubs, 5000);
 animate();
 
 </script>
