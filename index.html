@@ -1,48 +1,45 @@
 const channelID = "UCSHFe4OT_G2YjxW28IDdjlw";
+const API_KEY = "AIzaSyB0_XrhACmSyxwvtiJiGMdq_RgtOHZ0eHA";
 
 let currentSubs = 0;
 let targetSubs = 0;
 
-// safe fetch
 async function fetchSubs() {
   try {
-    const res = await fetch(
-      `https://www.googleapis.com/youtube/v3/channels?part=statistics&id=${UCSHFe4OT_G2YjxW28IDdjlw}&key=AIzaSyB0_XrhACmSyxwvtiJiGMdq_RgtOHZ0eHA`
-    );
+    const url = `https://www.googleapis.com/youtube/v3/channels?part=statistics&id=${UCSHFe4OT_G2YjxW28IDdjlw}&key=${AIzaSyB0_XrhACmSyxwvtiJiGMdq_RgtOHZ0eHA}`;
 
+    const res = await fetch(url);
     const data = await res.json();
+
+    console.log("API RESPONSE:", data);
 
     const subs = data?.items?.[0]?.statistics?.subscriberCount;
 
-    if (subs) {
-      targetSubs = parseInt(subs);
-    } else {
-      console.log("No subs returned:", data);
+    if (!subs) {
+      console.log("No subscriber data found");
+      return;
     }
 
-  } catch (e) {
-    console.log("Fetch failed:", e);
+    targetSubs = parseInt(subs);
+
+  } catch (err) {
+    console.log("FETCH ERROR:", err);
   }
 }
 
-// easing animation
 function animate() {
-  if (!isNaN(targetSubs) && targetSubs > 0) {
+  if (targetSubs > 0) {
     currentSubs += (targetSubs - currentSubs) * 0.08;
   }
 
-  // fallback so it NEVER stays stuck
-  if (currentSubs === 0 && targetSubs > 0) {
-    currentSubs = targetSubs;
-  }
-
   document.getElementById("counter").innerText =
-    Math.floor(currentSubs).toLocaleString();
+    targetSubs > 0
+      ? Math.floor(currentSubs).toLocaleString()
+      : "Loading...";
 
   requestAnimationFrame(animate);
 }
 
-// start
 fetchSubs();
 setInterval(fetchSubs, 5000);
 animate();
