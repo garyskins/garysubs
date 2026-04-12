@@ -7,7 +7,7 @@
 <style>
 body {
   margin: 0;
-  background: rgba(0,0,0,0);
+  background: transparent;
   overflow: hidden;
   font-family: Arial, sans-serif;
 }
@@ -17,7 +17,7 @@ body {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-
+  
   font-size: 90px;
   font-weight: 900;
   color: white;
@@ -33,31 +33,37 @@ body {
 <div id="counter">0</div>
 
 <script>
+
+// 🔴 PUT YOUR CHANNEL ID HERE
 const channelID = "UCSHFe4OT_G2YjxW28IDdjlw";
 
 let currentSubs = 0;
 let targetSubs = 0;
 
-// fetch live subs
+// ✅ SAFE FETCH (prevents NaN)
 async function fetchSubs() {
   try {
-    const res = await fetch(`https://mixerno.space/api/youtube-channel-counter/user/${channelID}`);
+    const res = await fetch(`https://api.socialcounts.org/youtube-live-subscriber-count/${channelID}`);
     const data = await res.json();
 
-    targetSubs = Number(data.counts.subscribers);
+    // safety check
+    if (!data || typeof data.est_sub !== "number") return;
+
+    targetSubs = data.est_sub;
+
   } catch (e) {
-    console.log("Error fetching subs");
+    console.log("Fetch error:", e);
   }
 }
 
-// smooth animation loop
+// 🎯 smooth animation loop
 function animate() {
-  // ease toward target
-  currentSubs += (targetSubs - currentSubs) * 0.08;
+  if (!isNaN(targetSubs)) {
+    currentSubs += (targetSubs - currentSubs) * 0.08;
 
-  // stop tiny decimals
-  if (Math.abs(targetSubs - currentSubs) < 0.5) {
-    currentSubs = targetSubs;
+    if (Math.abs(targetSubs - currentSubs) < 0.5) {
+      currentSubs = targetSubs;
+    }
   }
 
   document.getElementById("counter").innerText =
@@ -68,8 +74,9 @@ function animate() {
 
 // start
 fetchSubs();
-setInterval(fetchSubs, 2000); // update API every 3s
+setInterval(fetchSubs, 2000);
 animate();
+
 </script>
 
 </body>
