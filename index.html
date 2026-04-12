@@ -4,9 +4,6 @@
 <meta charset="utf-8" />
 <title>Sub Counter</title>
 
-<!-- 🔥 BLOCKY FONT -->
-<link href="https://fonts.googleapis.com/css2?family=Anton&display=swap" rel="stylesheet">
-
 <style>
 body {
   margin: 0;
@@ -22,7 +19,7 @@ body {
 
   font-size: 90px;
   font-weight: 900;
-  font-family: 'Rubik', sans-serif;
+  font-family: "Arial Rounded MT Bold", Arial, sans-serif;
 
   color: white;
 
@@ -46,7 +43,7 @@ const API_KEY = "AIzaSyCVWFvY9cob_YfmoS3hP9S1iQ7FtCR429I";
 let currentSubs = 0;
 let targetSubs = 0;
 
-// 🔥 SAFE API FETCH (no silent failures)
+// 🔥 YouTube API fetch
 async function fetchSubs() {
   try {
     const url =
@@ -54,8 +51,6 @@ async function fetchSubs() {
 
     const res = await fetch(url);
     const data = await res.json();
-
-    console.log("API:", data);
 
     const subs = data?.items?.[0]?.statistics?.subscriberCount;
 
@@ -68,9 +63,9 @@ async function fetchSubs() {
   }
 }
 
-// 🌊 smooth easing (professional motion)
-function easeOutCubic(t) {
-  return 1 - Math.pow(1 - t, 3);
+// 🌊 smooth ease-in-out (slow → fast → slow)
+function easeInOutSine(t) {
+  return -(Math.cos(Math.PI * t) - 1) / 2;
 }
 
 let startValue = 0;
@@ -78,11 +73,6 @@ let endValue = 0;
 let progress = 1;
 
 function animate() {
-
-  // 🔥 instant sync fix on first load
-  if (currentSubs === 0 && targetSubs > 0) {
-    currentSubs = targetSubs;
-  }
 
   // detect change
   if (endValue !== targetSubs) {
@@ -92,9 +82,9 @@ function animate() {
   }
 
   if (progress < 1) {
-    progress += 0.0045; // 🔥 slower, smoother, more “TV style”
+    progress += 0.006; // smooth speed control
 
-    const eased = easeOutCubic(progress);
+    const eased = easeInOutSine(progress);
 
     currentSubs = startValue + (endValue - startValue) * eased;
   } else {
@@ -107,7 +97,7 @@ function animate() {
   requestAnimationFrame(animate);
 }
 
-// start loops
+// start
 fetchSubs();
 setInterval(fetchSubs, 5000);
 animate();
