@@ -1,12 +1,13 @@
 const channelID = "UCSHFe4OT_G2YjxW28IDdjlw";
-const API_KEY = "AIzaSyB0_XrhACmSyxwvtiJiGMdq_RgtOHZ0eHA";
+const API_KEY = "AIzaSyASErAf2xhVzBwBpf6ScmxpohQSVcBpRiU";
 
 let currentSubs = 0;
 let targetSubs = 0;
 
 async function fetchSubs() {
   try {
-    const url = `https://www.googleapis.com/youtube/v3/channels?part=statistics&id=${UCSHFe4OT_G2YjxW28IDdjlw}&key=${AIzaSyB0_XrhACmSyxwvtiJiGMdq_RgtOHZ0eHA}`;
+    const url =
+      `https://www.googleapis.com/youtube/v3/channels?part=statistics&id=${channelID}&key=${API_KEY}`;
 
     const res = await fetch(url);
     const data = await res.json();
@@ -16,14 +17,14 @@ async function fetchSubs() {
     const subs = data?.items?.[0]?.statistics?.subscriberCount;
 
     if (!subs) {
-      console.log("No subscriber data found");
+      console.log("No subscriber data (check API key / quota / enable API)");
       return;
     }
 
     targetSubs = parseInt(subs);
 
   } catch (err) {
-    console.log("FETCH ERROR:", err);
+    console.log("Fetch error:", err);
   }
 }
 
