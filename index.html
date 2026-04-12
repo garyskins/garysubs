@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="utf-8" />
-<title>Sub Counter</title>
+<title>Live Sub Counter</title>
 
 <style>
 body {
@@ -34,32 +34,34 @@ body {
 
 <script>
 
-// 🔴 PUT YOUR CHANNEL ID HERE
-const channelID = "UCSHFe4OT_G2YjxW28IDdjlw";
+// 🔴 YOUR INFO HERE
+const API_KEY = "AIzaSyB0_XrhACmSyxwvtiJiGMdq_RgtOHZ0eHA";
+const CHANNEL_ID = "UCSHFe4OT_G2YjxW28IDdjlw";
 
 let currentSubs = 0;
 let targetSubs = 0;
 
-// ✅ WORKING API (more stable than SocialCounts)
+// ✅ OFFICIAL YOUTUBE API
 async function fetchSubs() {
   try {
-    const res = await fetch(`https://mixerno.space/api/youtube-channel-counter/user/${channelID}`);
+    const url =
+      `https://www.googleapis.com/youtube/v3/channels?part=statistics&id=${CHANNEL_ID}&key=${API_KEY}`;
+
+    const res = await fetch(url);
     const data = await res.json();
 
-    if (
-      data &&
-      data.counts &&
-      typeof data.counts.subscribers === "number"
-    ) {
-      targetSubs = data.counts.subscribers;
+    const subs = data?.items?.[0]?.statistics?.subscriberCount;
+
+    if (subs) {
+      targetSubs = parseInt(subs);
     }
 
   } catch (e) {
-    console.log("Fetch error:", e);
+    console.log("API error:", e);
   }
 }
 
-// 🎯 smooth animation
+// 🎯 smooth roll animation
 function animate() {
   if (!isNaN(targetSubs)) {
     currentSubs += (targetSubs - currentSubs) * 0.08;
@@ -77,7 +79,7 @@ function animate() {
 
 // start loops
 fetchSubs();
-setInterval(fetchSubs, 2000);
+setInterval(fetchSubs, 5000);
 animate();
 
 </script>
