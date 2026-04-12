@@ -12,7 +12,6 @@ body {
   margin: 0;
   background: transparent;
   overflow: hidden;
-  font-family: Arial, sans-serif;
 }
 
 #counter {
@@ -31,7 +30,6 @@ body {
   text-align: center;
 
   letter-spacing: 1px;
-  text-transform: uppercase;
 }
 </style>
 </head>
@@ -48,7 +46,7 @@ const API_KEY = "AIzaSyCVWFvY9cob_YfmoS3hP9S1iQ7FtCR429I";
 let currentSubs = 0;
 let targetSubs = 0;
 
-// 🔥 fetch real subs
+// 🔥 SAFE API FETCH (no silent failures)
 async function fetchSubs() {
   try {
     const url =
@@ -56,6 +54,8 @@ async function fetchSubs() {
 
     const res = await fetch(url);
     const data = await res.json();
+
+    console.log("API:", data);
 
     const subs = data?.items?.[0]?.statistics?.subscriberCount;
 
@@ -68,7 +68,7 @@ async function fetchSubs() {
   }
 }
 
-// 🌊 smooth professional easing
+// 🌊 smooth easing (professional motion)
 function easeOutCubic(t) {
   return 1 - Math.pow(1 - t, 3);
 }
@@ -79,6 +79,12 @@ let progress = 1;
 
 function animate() {
 
+  // 🔥 instant sync fix on first load
+  if (currentSubs === 0 && targetSubs > 0) {
+    currentSubs = targetSubs;
+  }
+
+  // detect change
   if (endValue !== targetSubs) {
     startValue = currentSubs;
     endValue = targetSubs;
@@ -86,7 +92,7 @@ function animate() {
   }
 
   if (progress < 1) {
-    progress += 0.006; // 🔥 slow smooth motion
+    progress += 0.0045; // 🔥 slower, smoother, more “TV style”
 
     const eased = easeOutCubic(progress);
 
@@ -103,4 +109,10 @@ function animate() {
 
 // start loops
 fetchSubs();
-setInterval(fetchSubs, 5000)
+setInterval(fetchSubs, 5000);
+animate();
+
+</script>
+
+</body>
+</html>
