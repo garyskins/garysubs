@@ -17,7 +17,7 @@ body {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  
+
   font-size: 90px;
   font-weight: 900;
   color: white;
@@ -30,7 +30,7 @@ body {
 
 <body>
 
-<div id="counter">0</div>
+<div id="counter">Loading...</div>
 
 <script>
 
@@ -40,23 +40,26 @@ const channelID = "UCSHFe4OT_G2YjxW28IDdjlw";
 let currentSubs = 0;
 let targetSubs = 0;
 
-// ✅ SAFE FETCH (prevents NaN)
+// ✅ WORKING API (more stable than SocialCounts)
 async function fetchSubs() {
   try {
-    const res = await fetch(`https://api.socialcounts.org/youtube-live-subscriber-count/${channelID}`);
+    const res = await fetch(`https://mixerno.space/api/youtube-channel-counter/user/${channelID}`);
     const data = await res.json();
 
-    // safety check
-    if (!data || typeof data.est_sub !== "number") return;
-
-    targetSubs = data.est_sub;
+    if (
+      data &&
+      data.counts &&
+      typeof data.counts.subscribers === "number"
+    ) {
+      targetSubs = data.counts.subscribers;
+    }
 
   } catch (e) {
     console.log("Fetch error:", e);
   }
 }
 
-// 🎯 smooth animation loop
+// 🎯 smooth animation
 function animate() {
   if (!isNaN(targetSubs)) {
     currentSubs += (targetSubs - currentSubs) * 0.08;
@@ -72,9 +75,9 @@ function animate() {
   requestAnimationFrame(animate);
 }
 
-// start
+// start loops
 fetchSubs();
-setInterval(fetchSubs, 2000);
+setInterval(fetchSubs, 3000);
 animate();
 
 </script>
