@@ -1,8 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>Sub Counter</title>
+
+<style>
+body {
+  margin: 0;
+  background: transparent;
+  overflow: hidden;
+  font-family: Arial, sans-serif;
+}
+
+#counter {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+
+  font-size: 90px;
+  font-weight: 900;
+  color: white;
+
+  -webkit-text-stroke: 4px black;
+  text-align: center;
+}
+</style>
+</head>
+
+<body>
+
+<div id="counter">Loading...</div>
+
+<script>
+
 const channelID = "UCSHFe4OT_G2YjxW28IDdjlw";
-const API_KEY = "AIzaSyASErAf2xhVzBwBpf6ScmxpohQSVcBpRiU";
+
+// 🔴 PUT YOUR NEW API KEY HERE
+const API_KEY = "AIzaSyCVWFvY9cob_YfmoS3hP9S1iQ7FtCR429I";
 
 let currentSubs = 0;
 let targetSubs = 0;
+let hasLoaded = false;
 
 async function fetchSubs() {
   try {
@@ -17,30 +56,38 @@ async function fetchSubs() {
     const subs = data?.items?.[0]?.statistics?.subscriberCount;
 
     if (!subs) {
-      console.log("No subscriber data (check API key / quota / enable API)");
+      document.getElementById("counter").innerText = "API ERROR";
       return;
     }
 
     targetSubs = parseInt(subs);
+    hasLoaded = true;
 
-  } catch (err) {
-    console.log("Fetch error:", err);
+  } catch (e) {
+    console.log("Fetch error:", e);
+    document.getElementById("counter").innerText = "FETCH ERROR";
   }
 }
 
 function animate() {
-  if (targetSubs > 0) {
+  if (hasLoaded) {
     currentSubs += (targetSubs - currentSubs) * 0.08;
   }
 
   document.getElementById("counter").innerText =
-    targetSubs > 0
+    hasLoaded
       ? Math.floor(currentSubs).toLocaleString()
       : "Loading...";
 
   requestAnimationFrame(animate);
 }
 
+// start
 fetchSubs();
 setInterval(fetchSubs, 5000);
 animate();
+
+</script>
+
+</body>
+</html>
