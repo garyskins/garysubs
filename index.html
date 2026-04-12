@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>Sub Counter</title>
+
+<style>
+body {
+  margin: 0;
+  background: rgba(0,0,0,0);
+  overflow: hidden;
+  font-family: Arial, sans-serif;
+}
+
+#counter {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+
+  font-size: 90px;
+  font-weight: 900;
+  color: white;
+
+  -webkit-text-stroke: 4px black;
+  text-align: center;
+}
+</style>
+</head>
+
+<body>
+
+<div id="counter">0</div>
+
+<script>
+const channelID = "YOUR_CHANNEL_ID";
+
+let currentSubs = 0;
+let targetSubs = 0;
+
+// fetch live subs
+async function fetchSubs() {
+  try {
+    const res = await fetch(`https://mixerno.space/api/youtube-channel-counter/user/${channelID}`);
+    const data = await res.json();
+
+    targetSubs = Number(data.counts.subscribers);
+  } catch (e) {
+    console.log("Error fetching subs");
+  }
+}
+
+// smooth animation loop
+function animate() {
+  // ease toward target
+  currentSubs += (targetSubs - currentSubs) * 0.08;
+
+  // stop tiny decimals
+  if (Math.abs(targetSubs - currentSubs) < 0.5) {
+    currentSubs = targetSubs;
+  }
+
+  document.getElementById("counter").innerText =
+    Math.floor(currentSubs).toLocaleString();
+
+  requestAnimationFrame(animate);
+}
+
+// start
+fetchSubs();
+setInterval(fetchSubs, 3000); // update API every 3s
+animate();
+</script>
+
+</body>
+</html>
