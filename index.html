@@ -24,20 +24,27 @@ body {
   font-weight: 900;
   font-family: 'Rubik', Arial, sans-serif;
 
-  color: white;
-  -webkit-text-stroke: 6px black;
-
   text-align: center;
   letter-spacing: 1px;
 
-  /* 🔥 INNER SHADE EFFECT */
-  background: linear-gradient(to top, #9a9a9a 0%, #ffffff 55%);
+  /* 🧱 METAL COLOR SPLIT */
+  background: linear-gradient(to bottom,
+    #ffffff 0%,
+    #ffffff 50%,
+    #b0b0b0 50%,
+    #6f6f6f 100%
+  );
+
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 
-  /* fallback shadow depth */
+  /* 🖤 OUTLINE FOR CONTRAST */
+  -webkit-text-stroke: 5px black;
+
+  /* ✨ METAL DEPTH SHADOW */
   text-shadow:
-    0px 3px 0px rgba(0,0,0,0.35);
+    0px 3px 0px rgba(0,0,0,0.35),
+    0px 6px 10px rgba(0,0,0,0.25);
 }
 
 }
