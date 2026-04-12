@@ -25,11 +25,21 @@ body {
   font-family: 'Rubik', Arial, sans-serif;
 
   color: white;
-
   -webkit-text-stroke: 6px black;
-  text-align: center;
 
+  text-align: center;
   letter-spacing: 1px;
+
+  /* 🔥 INNER SHADE EFFECT */
+  background: linear-gradient(to top, #9a9a9a 0%, #ffffff 55%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+
+  /* fallback shadow depth */
+  text-shadow:
+    0px 3px 0px rgba(0,0,0,0.35);
+}
+
 }
 </style>
 </head>
