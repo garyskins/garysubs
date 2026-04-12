@@ -9,7 +9,7 @@ body {
   margin: 0;
   background: transparent;
   overflow: hidden;
-  font-family: 'Boulder', sans-serif;
+  font-family: 'Anton', sans-serif;
 }
 
 #counter {
@@ -62,13 +62,30 @@ async function fetchSubs() {
 }
 
 // 🎯 smooth roll animation
-function animate() {
-  if (!isNaN(targetSubs)) {
-    currentSubs += (targetSubs - currentSubs) * 0.08;
+let startValue = 0;
+let endValue = 0;
+let progress = 0;
 
-    if (Math.abs(targetSubs - currentSubs) < 0.5) {
-      currentSubs = targetSubs;
-    }
+function easeInOutSine(t) {
+  return -(Math.cos(Math.PI * t) - 1) / 2;
+}
+
+function animate() {
+  // when target changes, restart animation
+  if (endValue !== targetSubs) {
+    startValue = currentSubs;
+    endValue = targetSubs;
+    progress = 0;
+  }
+
+  if (progress < 1) {
+    progress += 0.01; // ⬅️ SPEED (lower = slower)
+
+    const eased = easeInOutSine(progress);
+
+    currentSubs = startValue + (endValue - startValue) * eased;
+  } else {
+    currentSubs = targetSubs;
   }
 
   document.getElementById("counter").innerText =
@@ -76,11 +93,6 @@ function animate() {
 
   requestAnimationFrame(animate);
 }
-
-// start loops
-fetchSubs();
-setInterval(fetchSubs, 2000);
-animate();
 
 </script>
 
