@@ -4,6 +4,9 @@
 <meta charset="utf-8" />
 <title>Sub Counter</title>
 
+<!-- 🔥 BLOCKY FONT -->
+<link href="https://fonts.googleapis.com/css2?family=Anton&display=swap" rel="stylesheet">
+
 <style>
 body {
   margin: 0;
@@ -20,10 +23,15 @@ body {
 
   font-size: 90px;
   font-weight: 900;
+  font-family: 'Anton', sans-serif;
+
   color: white;
 
   -webkit-text-stroke: 4px black;
   text-align: center;
+
+  letter-spacing: 1px;
+  text-transform: uppercase;
 }
 </style>
 </head>
@@ -35,14 +43,12 @@ body {
 <script>
 
 const channelID = "UCSHFe4OT_G2YjxW28IDdjlw";
-
-// 🔴 PUT YOUR NEW API KEY HERE
 const API_KEY = "AIzaSyCVWFvY9cob_YfmoS3hP9S1iQ7FtCR429I";
 
 let currentSubs = 0;
 let targetSubs = 0;
-let hasLoaded = false;
 
+// 🔥 fetch real subs
 async function fetchSubs() {
   try {
     const url =
@@ -51,43 +57,50 @@ async function fetchSubs() {
     const res = await fetch(url);
     const data = await res.json();
 
-    console.log("API RESPONSE:", data);
-
     const subs = data?.items?.[0]?.statistics?.subscriberCount;
 
-    if (!subs) {
-      document.getElementById("counter").innerText = "API ERROR";
-      return;
+    if (subs) {
+      targetSubs = parseInt(subs);
     }
 
-    targetSubs = parseInt(subs);
-    hasLoaded = true;
-
   } catch (e) {
-    console.log("Fetch error:", e);
-    document.getElementById("counter").innerText = "FETCH ERROR";
+    console.log("API error:", e);
   }
 }
 
+// 🌊 smooth professional easing
+function easeOutCubic(t) {
+  return 1 - Math.pow(1 - t, 3);
+}
+
+let startValue = 0;
+let endValue = 0;
+let progress = 1;
+
 function animate() {
-  if (hasLoaded) {
-    currentSubs += (targetSubs - currentSubs) * 0.08;
+
+  if (endValue !== targetSubs) {
+    startValue = currentSubs;
+    endValue = targetSubs;
+    progress = 0;
+  }
+
+  if (progress < 1) {
+    progress += 0.006; // 🔥 slow smooth motion
+
+    const eased = easeOutCubic(progress);
+
+    currentSubs = startValue + (endValue - startValue) * eased;
+  } else {
+    currentSubs = targetSubs;
   }
 
   document.getElementById("counter").innerText =
-    hasLoaded
-      ? Math.floor(currentSubs).toLocaleString()
-      : "Loading...";
+    Math.floor(currentSubs).toLocaleString();
 
   requestAnimationFrame(animate);
 }
 
-// start
+// start loops
 fetchSubs();
-setInterval(fetchSubs, 5000);
-animate();
-
-</script>
-
-</body>
-</html>
+setInterval(fetchSubs, 5000)
