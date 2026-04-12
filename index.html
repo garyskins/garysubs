@@ -1,90 +1,38 @@
-<!DOCTYPE html>
-<html>
-<head>
-<meta charset="utf-8" />
-<title>Live Sub Counter</title>
-
-<style>
-body {
-  margin: 0;
-  background: transparent;
-  overflow: hidden;
-  font-family: 'Anton', sans-serif;
-}
-
-#counter {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-
-  font-size: 90px;
-  font-weight: 900;
-  color: white;
-
-  -webkit-text-stroke: 4px black;
-  text-align: center;
-}
-</style>
-</head>
-
-<body>
-
-<div id="counter">Loading...</div>
-
-<script>
-
-// 🔴 YOUR INFO HERE
-const API_KEY = "AIzaSyB0_XrhACmSyxwvtiJiGMdq_RgtOHZ0eHA";
-const CHANNEL_ID = "UCSHFe4OT_G2YjxW28IDdjlw";
+const channelID = "UCSHFe4OT_G2YjxW28IDdjlw";
 
 let currentSubs = 0;
 let targetSubs = 0;
 
-// ✅ OFFICIAL YOUTUBE API
+// safe fetch
 async function fetchSubs() {
   try {
-    const url =
-      `https://www.googleapis.com/youtube/v3/channels?part=statistics&id=${CHANNEL_ID}&key=${API_KEY}`;
+    const res = await fetch(
+      `https://www.googleapis.com/youtube/v3/channels?part=statistics&id=${UCSHFe4OT_G2YjxW28IDdjlw}&key=AIzaSyB0_XrhACmSyxwvtiJiGMdq_RgtOHZ0eHA`
+    );
 
-    const res = await fetch(url);
     const data = await res.json();
 
     const subs = data?.items?.[0]?.statistics?.subscriberCount;
 
     if (subs) {
       targetSubs = parseInt(subs);
+    } else {
+      console.log("No subs returned:", data);
     }
 
   } catch (e) {
-    console.log("API error:", e);
+    console.log("Fetch failed:", e);
   }
 }
 
-// 🎯 smooth roll animation
-let startValue = 0;
-let endValue = 0;
-let progress = 0;
-
-function easeInOutSine(t) {
-  return -(Math.cos(Math.PI * t) - 1) / 2;
-}
-
+// easing animation
 function animate() {
-  // when target changes, restart animation
-  if (endValue !== targetSubs) {
-    startValue = currentSubs;
-    endValue = targetSubs;
-    progress = 0;
+  if (!isNaN(targetSubs) && targetSubs > 0) {
+    currentSubs += (targetSubs - currentSubs) * 0.08;
   }
 
-  if (progress < 1) {
-    progress += 0.01; // ⬅️ SPEED (lower = slower)
-
-    const eased = easeInOutSine(progress);
-
-    currentSubs = startValue + (endValue - startValue) * eased;
-  } else {
+  // fallback so it NEVER stays stuck
+  if (currentSubs === 0 && targetSubs > 0) {
     currentSubs = targetSubs;
   }
 
@@ -94,7 +42,7 @@ function animate() {
   requestAnimationFrame(animate);
 }
 
-</script>
-
-</body>
-</html>
+// start
+fetchSubs();
+setInterval(fetchSubs, 5000);
+animate();
